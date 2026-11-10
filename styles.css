@@ -222,6 +222,8 @@ svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width:
 .form-status { font-size: .9rem; font-weight: 600; min-height: 1.2em; }
 .form-status.error { color: #C03535; }
 .form-status.info { color: var(--blue); }
+.form-status.success { color: #1E8E4E; background: #E8F7EE; border-left: 3px solid #1E8E4E; padding: 10px 14px; border-radius: 6px; }
+.hp-field { display: none !important; }
 
 /* Footer */
 .site-footer { background: var(--navy-deep); color: rgba(255,255,255,.65); padding: 80px 0 0; font-size: .93rem; }

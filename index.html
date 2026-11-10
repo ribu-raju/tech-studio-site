@@ -357,7 +357,7 @@
 
         <form class="enquiry-form reveal" id="enquiry-form" novalidate>
           <h3>Send an Enquiry</h3>
-          <p class="form-note">Submitting opens your email app with this enquiry pre-filled, addressed to sales@techstudiosolutions.com. Just press send.</p>
+          <input type="checkbox" name="botcheck" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
           <div class="form-row">
             <label>Full Name *<input type="text" name="name" required autocomplete="name"></label>
             <label>Company<input type="text" name="company" autocomplete="organization"></label>
@@ -388,7 +388,7 @@
           </label>
           <label>Message *<textarea name="message" id="message-field" rows="5" required></textarea></label>
           <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
-          <button type="submit" class="btn btn-primary btn-lg btn-block">Open Email to Send Enquiry <svg class="ic"><use href="#i-arrow"/></svg></button>
+          <button type="submit" class="btn btn-primary btn-lg btn-block">Send Enquiry <svg class="ic"><use href="#i-arrow"/></svg></button>
         </form>
       </div>
     </section>

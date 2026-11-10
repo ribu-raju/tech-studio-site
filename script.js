@@ -2,6 +2,8 @@
 (function () {
   "use strict";
   var COMPANY_EMAIL = "sales@techstudiosolutions.com";
+  // Web3Forms access key (from web3forms.com) – enquiries are emailed to the address it was created for
+  var WEB3FORMS_KEY = "37f25c34-1533-4d63-a37a-2cfb67894f27";
 
   var header = document.querySelector(".site-header");
   var toggle = document.querySelector(".nav-toggle");
@@ -73,8 +75,10 @@
     });
   });
 
-  // Enquiry form -> mailto (no backend). Never claims the message was sent.
+  // Enquiry form -> Web3Forms (emails the enquiry, no backend needed)
   var status = document.getElementById("form-status");
+  var submitBtn = form.querySelector('button[type="submit"]');
+  var btnHTML = submitBtn.innerHTML;
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     var data = new FormData(form);
@@ -92,17 +96,46 @@
       missing[0].focus();
       return;
     }
-    var subject = "Website Enquiry: " + data.get("service") + " – " + data.get("name");
-    var body =
-      "Name: " + data.get("name") + "\n" +
-      "Company: " + (data.get("company") || "-") + "\n" +
-      "Email: " + data.get("email") + "\n" +
-      "Phone: " + data.get("phone") + "\n" +
-      "Service Required: " + data.get("service") + "\n\n" +
-      "Message:\n" + data.get("message");
-    window.location.href = "mailto:" + COMPANY_EMAIL + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
-    status.className = "form-status info";
-    status.innerHTML = "Your email app should now open with the enquiry ready — please press <strong>Send</strong> there to deliver it. If nothing opened, email us at <a href=\"mailto:" + COMPANY_EMAIL + "\">" + COMPANY_EMAIL + "</a> or use WhatsApp.";
+    if (form.elements.botcheck && form.elements.botcheck.checked) return; // spam bot
+
+    var payload = {
+      access_key: WEB3FORMS_KEY,
+      subject: "Website Enquiry: " + data.get("service") + " – " + data.get("name"),
+      from_name: "Tech Studio Website",
+      replyto: data.get("email"),
+      name: data.get("name"),
+      company: data.get("company") || "-",
+      email: data.get("email"),
+      phone: data.get("phone"),
+      service: data.get("service"),
+      message: data.get("message")
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending...";
+    status.className = "form-status";
+    status.textContent = "";
+
+    fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(payload)
+    })
+      .then(function (res) { return res.json(); })
+      .then(function (json) {
+        if (!json.success) throw new Error(json.message || "Failed");
+        form.reset();
+        status.className = "form-status success";
+        status.textContent = "Thank you! Your enquiry has been submitted successfully. Our team will contact you shortly.";
+      })
+      .catch(function () {
+        status.className = "form-status error";
+        status.innerHTML = "Sorry, something went wrong. Please try again or email us at <a href=\"mailto:" + COMPANY_EMAIL + "\">" + COMPANY_EMAIL + "</a>.";
+      })
+      .finally(function () {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = btnHTML;
+      });
   });
   form.querySelectorAll("input, select, textarea").forEach(function (el) {
     el.addEventListener("input", function () { el.classList.remove("invalid"); });
